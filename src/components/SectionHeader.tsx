@@ -1,42 +1,24 @@
 import { motion } from 'framer-motion'
 
-interface SectionHeaderProps {
-  eyebrow: string
-  title: string
-  description?: string
-}
+interface Props { eyebrow?: string; title: string; subtitle?: string }
 
-export function SectionHeader({
-  eyebrow,
-  title,
-  description,
-}: SectionHeaderProps) {
+export default function SectionHeader({ eyebrow, title, subtitle }: Props) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.55, ease: 'easeOut' }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="mx-auto mb-14 max-w-3xl text-center"
     >
-      <motion.span
-        initial={{ opacity: 0, y: -8 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="inline-block rounded-full border border-cherry/15 bg-cherry/6 px-5 py-1.5 text-[11px] font-bold uppercase tracking-[0.28em] text-cherry"
-      >
-        {eyebrow}
-      </motion.span>
-      <h2 className="mt-6 font-heading text-4xl font-bold leading-tight text-deepbrown sm:text-5xl lg:text-5xl">
-        {title}
-      </h2>
-      {description ? (
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-deepbrown/60">
-          {description}
-        </p>
-      ) : null}
-      <div className="mx-auto mt-6 h-px w-16 bg-gradient-to-r from-transparent via-cherry/20 to-transparent" />
+      {eyebrow && (
+        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.25em] text-[#C9A84C]">{eyebrow}</span>
+      )}
+      <h2 className="mt-4 font-display text-4xl font-bold leading-tight text-[#1A1A1A] sm:text-5xl">{title}</h2>
+      {subtitle && (
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-[#4A4A4A]">{subtitle}</p>
+      )}
+      <div className="mx-auto mt-6 h-[2px] w-16 bg-[#C9A84C]/60 rounded-full" />
     </motion.div>
   )
 }

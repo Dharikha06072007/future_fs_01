@@ -1,54 +1,60 @@
-import type { LucideIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 export interface NavItem {
   id: string
   label: string
 }
 
-export interface ProjectLink {
-  label: string
-  href: string
-}
-
 export interface Project {
+  slug: string
   title: string
   description: string
-  longDescription?: string
+  category: string
   tech: string[]
-  accent: string
   icon: string
-  links?: ProjectLink[]
-  tags?: string[]
-  category?: 'web' | 'ai' | 'iot' | 'mobile'
-  hasGitHub?: boolean
+  images?: string[]
+  github?: string
+  demo?: string
+  problem?: string
+  solution?: string
+  learned?: string
 }
 
-export interface TimelineItem {
+export interface Education {
   institution: string
   credential: string
   period: string
-  focusAreas?: string[]
+  description: string
+  highlights?: string[]
+}
+
+export interface Skill {
+  name: string
+  level: number
+  icon?: string
 }
 
 export interface SkillGroup {
   title: string
-  skills: string[]
+  skills: Skill[]
 }
 
-export interface Stat {
+export interface Achievement {
+  metric: string
   label: string
-  value: string
 }
 
-export interface IconCard {
+export interface BlogPost {
+  slug: string
   title: string
-  icon: LucideIcon
+  excerpt: string
+  icon: string
+  date: string
+  content?: string
 }
 
-export interface ContactLink {
+export interface SocialLink {
   label: string
-  value: string
   href: string
-  icon: LucideIcon
-  copyValue?: string
+  icon: ReactNode
 }

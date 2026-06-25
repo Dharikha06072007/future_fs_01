@@ -1,11 +1,31 @@
-import { Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { navItems } from '../data/portfolio'
-import { useActiveSection } from '../hooks/useActiveSection'
 
-export function Navbar() {
-  const activeSection = useActiveSection()
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('home')
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const ids = navItems.map((n) => n.id)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+        if (visible?.target.id && ids.includes(visible.target.id)) setActiveSection(visible.target.id)
+      },
+      { rootMargin: '-20% 0px -60% 0px', threshold: [0.1, 0.3] }
+    )
+    ids.forEach((id) => { const el = document.getElementById(id); if (el) observer.observe(el) })
+    return () => observer.disconnect()
+  }, [])
 
   const navigate = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -13,73 +33,60 @@ export function Navbar() {
   }
 
   return (
-    <header className="fixed inset-x-0 top-4 z-50 px-4">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between rounded-full border border-beige/50 bg-cream/80 px-4 py-3 shadow-[0_16px_40px_rgba(62,39,35,0.06)] backdrop-blur-xl">
-        <button
-          type="button"
-          onClick={() => navigate('home')}
-          className="flex items-center gap-3 rounded-full focus:outline-none focus:ring-2 focus:ring-cherry/20"
-          aria-label="Go to home"
-        >
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-cherry to-deepbrown text-sm font-bold text-cream shadow-sm">
-            DU
-          </span>
-          <span className="hidden text-left sm:block">
-            <span className="block text-sm font-bold text-deepbrown">
-              Dharikha U
-            </span>
-            <span className="block text-xs text-deepbrown/50">
-              Product Builder
-            </span>
+    <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${scrolled ? 'shadow-[0_2px_12px_rgba(0,0,0,0.06)]' : ''}`}>
+      <nav className="bg-white mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <button type="button" onClick={() => navigate('home')} className="flex items-center gap-2">
+          <span className="font-display text-xl font-bold tracking-tight text-[#1A1A1A]">
+            Dharikha <span className="text-[#7B2D3E]">U</span>
           </span>
         </button>
 
-        <div className="hidden items-center gap-1 lg:flex">
+        <div className="hidden items-center gap-1 md:flex">
           {navItems.map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => navigate(item.id)}
-              className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                activeSection === item.id
-                  ? 'bg-gradient-to-r from-cherry to-deepbrown text-cream shadow-md shadow-cherry/15'
-                  : 'text-deepbrown/60 hover:bg-cherry/6 hover:text-cherry'
+              className={`relative px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                activeSection === item.id ? 'text-[#7B2D3E]' : 'text-[#4A4A4A] hover:text-[#1A1A1A]'
               }`}
             >
               {item.label}
+              {activeSection === item.id && (
+                <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#C9A84C] rounded-full" />
+              )}
             </button>
           ))}
         </div>
 
         <button
           type="button"
-          onClick={() => setIsOpen((value) => !value)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-cherry/8 text-cherry lg:hidden"
-          aria-label="Toggle navigation menu"
-          aria-expanded={isOpen}
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative grid h-9 w-9 place-items-center md:hidden"
+          aria-label="Toggle menu"
         >
-          {isOpen ? <X size={20} /> : <Menu size={20} />}
+          <span className={`block h-[2px] w-5 rounded-full bg-[#1A1A1A] transition-all duration-300 ${isOpen ? 'translate-y-[3px] rotate-45' : '-translate-y-[3px]'}`} />
+          <span className={`block h-[2px] w-5 rounded-full bg-[#1A1A1A] transition-all duration-300 ${isOpen ? 'opacity-0' : 'opacity-100'}`} />
+          <span className={`block h-[2px] w-5 rounded-full bg-[#1A1A1A] transition-all duration-300 ${isOpen ? '-translate-y-[3px] -rotate-45' : 'translate-y-[3px]'}`} />
         </button>
       </nav>
 
-      {isOpen ? (
-        <div className="mx-auto mt-3 grid max-w-6xl gap-2 rounded-[1.5rem] border border-beige/50 bg-cream/90 p-3 shadow-2xl backdrop-blur-xl lg:hidden">
+      {isOpen && (
+        <div className="bg-white mx-4 mt-2 rounded-2xl border border-[#E8EDE3] p-3 shadow-xl md:hidden">
           {navItems.map((item) => (
             <button
               key={item.id}
               type="button"
               onClick={() => navigate(item.id)}
-              className={`rounded-2xl px-4 py-3 text-left text-sm font-semibold ${
-                activeSection === item.id
-                  ? 'bg-gradient-to-r from-cherry to-deepbrown text-cream'
-                  : 'text-deepbrown hover:bg-cherry/6 hover:text-cherry'
+              className={`block w-full rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors ${
+                activeSection === item.id ? 'text-[#7B2D3E] bg-[#F5E6E0]' : 'text-[#4A4A4A] hover:text-[#1A1A1A] hover:bg-[#E8EDE3]/50'
               }`}
             >
               {item.label}
             </button>
           ))}
         </div>
-      ) : null}
+      )}
     </header>
   )
 }
